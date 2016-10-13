@@ -1,3 +1,260 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include<iostream>
+#include<stdlib.h>
+#include<stdio.h>
+using namespace std;
+
+struct empleado{
+	char nomb1[20];
+	float sal;
+	struct empleado *sig1;
+};
+
+struct proyecto{
+	int numb;
+	char f_inicio[20],nomb[30];
+	int dur;
+	float mont;
+	struct empleado *emp;
+	struct proyecto *sig;
+	struct empleado *pil_in=NULL;
+	struct empleado *pil_fin=NULL;
+};
+
+struct proyecto *col_in=NULL;
+struct proyecto *pro=NULL;/* esta es solo una estructura auxiliar*/
+struct proyecto *col_fin=NULL;
+
+void ingresar_proyecto(struct proyecto **,proyecto **);
+void ingresar_empleados(struct proyecto**);
+int busqueda (int n_b, struct proyecto**);
+void mostrar_proyecto(struct proyecto *);
+void mostrar_empleado(struct proyecto **);
+void eliminar_proyecto(struct proyecto **,struct proyecto**);
+void eliminar_empleado(struct proyecto **);	
+int aux=0; //contador de proyectos
+
+typedef struct empleado empleado;
+
+int main (int argc, char *argv[]) {
+	int op=0,n_b=0,x=0;
+	struct proyecto *pro;
+	
+	while(1)
+	{
+		system("cls");
+		printf("\n\t1.) Ingresar Proyecto\n\n\t2.) Ingresar Empleado\n\n\t3.) Mostrar Proyecto \n\n\t4.) Mostrar Empleado");
+		printf("\n\n\t5.) Eliminar Proyecto\n\n\t6.) Eliminar Empleado\n\n\t7.) Salir\n");
+		scanf("%d",&op);
+		switch(op)
+		{
+		case 1:
+			system("cls");
+			ingresar_proyecto(&pro,&pro);
+			system("pause");
+			
+			break;
+		case 2:
+			system("cls");
+			fflush(stdin);
+			printf("\n\tNumero de Proyecto? [1 - %d] \n ",aux);
+			scanf("%d",&x);
+			n_b=busqueda(x,&pro);
+			if(n_b==1){
+				
+				ingresar_empleados(&pro);
+			}
+			else{
+				printf("\n\t No se encontro Numero de Proyecto\n");
+			}
+			system("pause");
+			break;
+		case 3:
+			system("cls");
+			mostrar_proyecto(pro);
+			system("pause");
+			break;
+		case 4:
+			system("cls");
+			printf("\n\tNumero de Proyecto? [1 - %d] \n ",aux );
+			scanf("%d",&x);
+			n_b=busqueda(x,&pro);
+			if(n_b==1){
+				
+				mostrar_empleado(&pro);
+			}
+			else{
+				printf("\n\t No se encontro Numero de Proyecto\n");
+			}
+			system("pause");
+			break;
+		case 5:
+			system("cls");
+			printf("\n\tNumero de Proyecto? [1 - %d] \n ",aux );
+			scanf("%d",&x);
+			n_b=busqueda(x,&pro);
+			if(n_b==1){
+				
+				eliminar_proyecto(&pro,&pro);
+			}
+			else{
+				printf("\n\t No se encontro Numero de Proyecto\n");
+			}
+			
+			system("pause");
+			break;
+		case 6:
+			system("cls");
+			fflush(stdin);
+			printf("\n\tNumero de Proyecto? [1 - %d] \n ",aux);
+			scanf("%d",&x);
+			n_b=busqueda(x,&pro);
+			if(n_b==1){
+				
+				eliminar_empleado(&pro);
+			}
+			else{
+				printf("\n\t No se encontro Numero de Proyecto\n");
+			}
+			
+			system("pause");
+			break;
+		case 7:
+			exit(0);
+			break;
+		}
+		
+	}
+	
+	return 0;
+}
+void ingresar_proyecto(struct proyecto **col_in,struct proyecto **col_fin){
+
+	struct proyecto *p=*col_fin;
+	struct proyecto *pro = (struct proyecto *) malloc(sizeof(struct proyecto));	
+	
+	pro->numb=aux++;
+	printf("Numero del Proyecto: %d\n", aux);
+	fflush(stdin);
+	printf("Nombre: ");
+	gets(pro->nomb);
+	printf("Fecha de inicio: ");
+	gets(pro->f_inicio);
+	fflush(stdin);
+	printf("Duracion: ");
+	scanf("%d",&pro->dur);
+	fflush(stdin);
+	printf("Monto: ");
+	scanf("%f",&pro->mont);
+	fflush(stdin);
+	
+	if (*col_in) {
+		*col_in=pro;
+		*col_fin=pro;
+		pro->sig=NULL;
+	} 
+	if (!*col_in){
+		p->sig=NULL;
+		p->sig=pro;
+		*col_fin=pro;
+	}
+}
+int busqueda(int np,struct proyecto **col_in)
+{
+	struct proyecto *p=*col_in;
+	while(p!=NULL)
+	{
+
+		if(p->numb==np)
+			return 1;
+		else
+			p=p->sig;
+	}
+	return 0;//no encontrado
+}
+void ingresar_empleados(struct proyecto **col_in){
+	
+	struct proyecto *p=*col_in;
+	struct empleado * emp= (struct empleado *) malloc(sizeof(struct empleado));
+
+	if (aux!=0){
+		printf("Nombre del Empleado: ");
+		fflush(stdin);
+		gets(emp->nomb1);
+		printf("Salario: ");
+		fflush(stdin);
+		scanf("%f",&emp->sal);
+		
+	}
+	else{
+		printf("\n\t No se han ingresado proyectos\n");
+	}
+	p->pil_in=emp;
+	if(p->pil_in==NULL){
+		p->pil_fin=emp;
+		
+	}
+	//Asignar la estructura empleado a la estructura proyecto
+	if(p->sig!=NULL){
+		p->pil_in=emp;
+		p->pil_fin=emp;
+		emp->sig1=NULL;
+	}
+	else{
+		emp->sig1=p->pil_in;
+		p->pil_in=emp;
+	}
+}
+void mostrar_proyecto(struct proyecto *col_in){
+	struct proyecto *p;
+	p=col_in;
+	
+	while(p !=NULL){
+		printf("\n\tNumero del Proyecto: %d\n",aux);
+		printf("\tNombre: \n"); puts(p->nomb);
+		printf("\tFecha de inicio: \n"); puts(p->f_inicio);
+		printf("\tDuracion: %d\n",p->dur);
+		printf("\tMonto: %f\n",p->mont);
+		p=p->sig;
+	}
+	
+}
+void mostrar_empleado(struct proyecto **col_in){
+	struct proyecto *p=*col_in;
+	struct empleado *e=NULL;
+	e=p->pil_in;
+	while(e!=NULL){
+		printf("\n\tProyecto encontrado\n");
+		printf("\n\tNombre del Empleado: "); puts(e->nomb1);
+		printf("\n\tSalario: %f\n",e->sal);
+		e=e->sig1;
+	}
+
+}
+void eliminar_proyecto(struct proyecto **col_in,struct proyecto **col_fin){
+	struct proyecto *borrar=*col_in;
+	if(*col_in!=NULL){
+		
+		*col_in=borrar->sig;
+		free(borrar);
+		if(*col_in==NULL)
+			*col_fin=NULL;
+		
+		while(borrar->pil_in!=NULL && borrar->pil_fin!=NULL){
+			eliminar_empleado(&borrar);
+		}
+	}
+	aux--;
+}
+void eliminar_empleado(struct proyecto **col_in){
+	struct empleado * borrar=NULL;
+	struct proyecto *pro=*col_in;
+	
+	if(pro->pil_in!=NULL)
+	{
+		
+		pro->pil_in=pro->pil_in->sig1;
+		free(borrar);
+		if(pro->pil_in==NULL)
+			pro->pil_fin=NULL;
+	}
+}
